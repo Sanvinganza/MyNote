@@ -9,8 +9,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { ChangeEvent, useRef, useState } from "react";
-import { findTags, strToHTML } from "../helpers";
+import React, { ChangeEvent, useRef, useState } from "react";
+import { findTags } from "../helpers";
 export interface INoteModalProps {
   open?: boolean;
   setOpen?: (open: boolean) => void;
@@ -22,19 +22,32 @@ export function NoteModal({
 }: INoteModalProps) {
   const [openAlert, setOpenAlert] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
-  const textRef =
-    useRef<string>(`Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nobis
-  laborum totam magnam eligendi, rerum et. awser fqawe fqwe{" "}
-  <b>#tag</b> qwe qwe`);
+  const [words, setWords] = useState<React.ReactNode[]>([]);
+  const word = useRef<string>("");
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
+    const lastChar = e.target.value[e.target.value.length - 1];
+    word.current += lastChar;
 
-    if (tags !== findTags(e.target.value)) {
-      setTags(findTags(e.target.value));
+    if (lastChar === " " || lastChar === "\n") {
+      console.log("word: ", word, "words: ", words);
+
+      if (tags !== findTags(e.target.value)) {
+        setTags(findTags(e.target.value));
+      }
+
+      if (word.current.startsWith("#")) {
+        setWords([
+          ...words,
+          <span style={{ color: "green" }}>{word.current}</span>,
+        ]);
+      } else {
+        setWords([...words, <>{word.current}</>]);
+      }
+
+      word.current = "";
     }
-
-    console.log(e.target.value);
   };
 
   const save = () => {
@@ -52,16 +65,20 @@ export function NoteModal({
               </Typography>
             ))}
           </Breadcrumbs>
-          <Typography
-            contentEditable
-            style={{
-              width: 400,
-              minHeight: 40,
-              marginBottom: 5,
-            }}
-            onChange={onChange}
-            children={<span>{strToHTML(textRef.current)}</span>}
-          />
+          <TextField multiline style={textStyle} onChange={onChange} />
+          <Breadcrumbs aria-label="breadcrumb">
+            {words.map((word) => (
+              <Typography
+                style={{
+                  width: 400,
+                  minHeight: 40,
+                  marginBottom: 5,
+                }}
+              >
+                {word}
+              </Typography>
+            ))}
+          </Breadcrumbs>
           <Button onClick={save}>SAVE</Button>
         </Box>
       </Modal>
@@ -77,6 +94,8 @@ export function NoteModal({
     </>
   );
 }
+
+const textStyle: React.CSSProperties = {};
 
 const style: React.CSSProperties = {
   position: "absolute" as "absolute",
