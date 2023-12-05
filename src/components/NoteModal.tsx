@@ -1,16 +1,7 @@
-import {
-  Alert,
-  Box,
-  Breadcrumbs,
-  Button,
-  Container,
-  Modal,
-  Snackbar,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Alert, Box, Button, Modal, Snackbar, TextField } from "@mui/material";
 import React, { ChangeEvent, useRef, useState } from "react";
-import { findTags } from "../helpers";
+import { findTags, getKey } from "../helpers";
+
 export interface INoteModalProps {
   open?: boolean;
   setOpen?: (open: boolean) => void;
@@ -28,10 +19,15 @@ export function NoteModal({
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const lastChar = e.target.value[e.target.value.length - 1];
-    word.current += lastChar;
 
     if (lastChar === " " || lastChar === "\n") {
       console.log("word: ", word, "words: ", words);
+
+      if (lastChar === "\n") {
+        words.push(<br />);
+      } else {
+        words.push(" ");
+      }
 
       if (tags !== findTags(e.target.value)) {
         setTags(findTags(e.target.value));
@@ -47,6 +43,8 @@ export function NoteModal({
       }
 
       word.current = "";
+    } else {
+      word.current += lastChar;
     }
   };
 
@@ -58,27 +56,19 @@ export function NoteModal({
     <>
       <Modal open={open} onClose={() => setOpen(false)}>
         <Box sx={style}>
-          <Breadcrumbs aria-label="breadcrumb">
-            {tags.map((tag) => (
-              <Typography key={tag} color="text.primary">
-                {tag}
-              </Typography>
-            ))}
-          </Breadcrumbs>
-          <TextField multiline style={textStyle} onChange={onChange} />
-          <Breadcrumbs aria-label="breadcrumb">
+          <TextField
+            multiline
+            inputProps={{ style: { color: "transparent" } }}
+            onChange={onChange}
+            style={{ height: 400, width: "100%" }}
+          />
+          <div
+            style={{ position: "absolute", top: 25, left: 25, fontSize: 18 }}
+          >
             {words.map((word) => (
-              <Typography
-                style={{
-                  width: 400,
-                  minHeight: 40,
-                  marginBottom: 5,
-                }}
-              >
-                {word}
-              </Typography>
+              <React.Fragment key={getKey()}>{word}</React.Fragment>
             ))}
-          </Breadcrumbs>
+          </div>
           <Button onClick={save}>SAVE</Button>
         </Box>
       </Modal>
@@ -94,8 +84,6 @@ export function NoteModal({
     </>
   );
 }
-
-const textStyle: React.CSSProperties = {};
 
 const style: React.CSSProperties = {
   position: "absolute" as "absolute",
