@@ -1,19 +1,14 @@
-import {
-  Alert,
-  Box,
-  Breadcrumbs,
-  Button,
-  Modal,
-  Snackbar,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Alert, Box, Button, Modal, Snackbar } from "@mui/material";
 import React, { ChangeEvent, useRef, useState } from "react";
-import { findTags, getKey } from "../helpers";
+import InputField from "./InputField";
 
 export interface INoteModalProps {
   open?: boolean;
   setOpen?: (open: boolean) => void;
+}
+interface IUpdateProps {
+  openAlert: boolean;
+  setOpenAlert: (open: boolean) => void;
 }
 
 export function NoteModal({
@@ -38,9 +33,9 @@ export function NoteModal({
         words.push(" ");
       }
 
-      if (tags !== findTags(e.target.value)) {
-        setTags(findTags(e.target.value));
-      }
+      // if (tags !== findTags(e.target.value)) {
+      //   setTags(findTags(e.target.value));
+      // }
 
       if (word.current.startsWith("#")) {
         setWords([
@@ -65,38 +60,12 @@ export function NoteModal({
     <>
       <Modal open={open} onClose={() => setOpen(false)}>
         <Box sx={style}>
-          <TextField
-            multiline
-            inputProps={{ style: { color: "transparent" } }}
-            onChange={onChange}
-            style={{ height: 400, width: "100%" }}
-          />
-          <div
-            style={{ position: "absolute", top: 25, left: 25, fontSize: 18 }}
-          >
-            {words.map((word) => (
-              <React.Fragment key={getKey()}>{word}</React.Fragment>
-            ))}
-          </div>
-          <Breadcrumbs aria-label="breadcrumb">
-            {tags.map((tag) => (
-              <Typography key={tag} color="text.primary">
-                {tag}
-              </Typography>
-            ))}
-          </Breadcrumbs>
+          <InputField />
           <Button onClick={save}>SAVE</Button>
         </Box>
       </Modal>
-      <Snackbar
-        open={openAlert}
-        autoHideDuration={2000}
-        onClose={() => setOpenAlert(false)}
-      >
-        <Alert severity="success" sx={{ width: "100%" }}>
-          Update!
-        </Alert>
-      </Snackbar>
+
+      <Update openAlert={openAlert} setOpenAlert={setOpenAlert} />
     </>
   );
 }
@@ -110,3 +79,15 @@ const style: React.CSSProperties = {
   borderRadius: 5,
   padding: 1,
 };
+
+const Update = ({ openAlert, setOpenAlert }: IUpdateProps) => (
+  <Snackbar
+    open={openAlert}
+    autoHideDuration={2000}
+    onClose={() => setOpenAlert(false)}
+  >
+    <Alert severity="success" sx={{ width: "100%" }}>
+      Update!
+    </Alert>
+  </Snackbar>
+);
