@@ -1,4 +1,13 @@
-import { Alert, Box, Button, Modal, Snackbar, TextField } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Breadcrumbs,
+  Button,
+  Modal,
+  Snackbar,
+  TextField,
+  Typography,
+} from "@mui/material";
 import React, { ChangeEvent, useRef, useState } from "react";
 import { findTags, getKey } from "../helpers";
 
@@ -69,6 +78,13 @@ export function NoteModal({
               <React.Fragment key={getKey()}>{word}</React.Fragment>
             ))}
           </div>
+          <Breadcrumbs aria-label="breadcrumb">
+            {tags.map((tag) => (
+              <Typography key={tag} color="text.primary">
+                {tag}
+              </Typography>
+            ))}
+          </Breadcrumbs>
           <Button onClick={save}>SAVE</Button>
         </Box>
       </Modal>
